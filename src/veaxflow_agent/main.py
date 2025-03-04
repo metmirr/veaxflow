@@ -84,7 +84,7 @@ def ai_agent(
         if not volume_data.empty and "volume" in volume_data
         else 5_000_000  # Fallback: $5M USDT
     )
-    threshold = 800  # $800/hour threshold
+    threshold = 700  # $700/hour threshold
 
     # Fee optimization
     if avg_volume >= threshold:
@@ -126,8 +126,20 @@ def main():
     if not pools:
         print("Failed to fetch pools—check endpoint or network.")
         return
+    near_usdt_pool = next(
+        (
+            pool
+            for pool in pools
+            if pool["token_a"] == "wrap.near"
+            and pool["token_b"] == "usdt.tether-token.near"
+        ),
+        None,
+    )
+    if not near_usdt_pool:
+        print("NEAR/USDT pool not found.")
+        return
 
-    pool = LiquidityPool(pools[7])  # NEAR/USDT pool
+    pool = LiquidityPool(near_usdt_pool)
     print("Initial:", pool.status())
 
     for _ in range(3):  # Simulate real-time adjustments
